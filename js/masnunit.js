@@ -89,7 +89,7 @@ if(!String.prototype.cut){
 	/*
 	ANALYZERESPONSE RENDER TEMPLATES EXTRADATA
 	均为数组，同一下标对应一类瀑布流形态(瀑布流单元里的内容或形状不相同)
-	
+	不同类别的瀑布流通过在 .woo-pcont 节点上的 data-wootemp="1" 设置
 	*/
 
 
@@ -97,10 +97,7 @@ if(!String.prototype.cut){
 
 	//####################################################################
 	TEMPLATES = [
-	'<% for (var i = 0; i < list.length; i ++) { %> \
-	<% var u = list[i],indx = $unit(u.id,u),olnk = $outlnk(u); %> \
-	<% if(!indx) continue; %> \
-<div class="woo"><div class="j"> \
+	'<% for (var i = 0; i < list.length; i ++) { %><% var u = list[i],indx = $unit(u.id,u),olnk = $outlnk(u); %><% if(!indx) continue; %><div class="woo"><div class="j"> \
 	<div class="mbpho" style="height:<%=u.iht > 800 ? 800 : u.iht%>px;"><a target="_blank" class="a" href="http://www.duitang.com/people/mblog/<%=u.id%>/detail/"><img <%=srcd ? "srcd" : "src"%>="<%=u.isrc%>" height="<%=u.iht%>" /><%= u.iht > 800 ? "<u style=\'margin-top:-"+(u.iht-720)+"px\'></u>" : ""%></a> \
 	</div> \
 	<div class="d"><span class="d1 d1-done"><%=u.favc%></span><span class="d2 d2-done"><%=u.zanc%></span><span class="d3"><%=u.repc%></span></div> \
@@ -111,7 +108,7 @@ if(!String.prototype.cut){
 	<li><a target="_blank" href="http://www.duitang.com/topics/"><img width="24" height="24" src="<%=u.cmts[j].ava%>"></a><p><a target="_blank" href="http://www.duitang.com/topics/"><%=$cut(u.cmts[j].name,16)%></a>&nbsp;<%=u.cmts[j].cont%></p></li> \
 <% } %>' +
 
-'</div></div>' +
+'</ul></div></div>' +
 	'<% } %>',
 	null,
 	null
@@ -145,11 +142,12 @@ if(!String.prototype.cut){
 	],
 
 	//####################################################################
-	// 这里给出了两种不同的数据组装方式，
+	// 这里给出了两种不同的数据组装方式
 	// 第一种使用 artTemplate 将字典对象转化成 html 字符串
 	// 第二种直接使用 + 号连接字符串
 	// 方法返回值必须是数组 ret = [cont,hasnext,totalcount] 前两个必须有，totalcount 可选
 	// ret[0]=cont 可以为字典(对应第一种组装方式)，也可以返回dom树(对应第二种组装方式)
+	// data-wootemp is set on the Node <div class="woo-pcont woo-masned my-album" data-wootemp="1" >  对应组装方法 ANALYZERESPONSE[1]
 	ANALYZERESPONSE = [
 		// ANALYZERESPONSE[0] 使用第一种组装方式，return 的主体内容 ret[0] 是字典
 		// 第一种组装方式依赖 RENDER TEMPLATES EXTRADATA 
@@ -166,10 +164,15 @@ if(!String.prototype.cut){
 			}
 
 			var ret = [[],true];
+
+
 			// 转json对象
-			var jsn = $.isPlainObject(h) ? h : $.parseJSON(h)
-			// 如果parse 失败，直接返回
-			if(!jsn) return ret;
+			try{
+				var jsn = $.isPlainObject(h) ? h : $.parseJSON(h)
+			}catch(e){
+				// 如果parse 失败，直接返回初始状态的 ret;
+				return ret;
+			}
 
 
 			// 判断jsn 请求是否成功返回数据
@@ -206,10 +209,15 @@ if(!String.prototype.cut){
 			}
 
 			var ret = [[],true];
+
+
 			// 转json对象
-			var jsn = $.isPlainObject(h) ? h : $.parseJSON(h)
-			// 如果parse 失败，直接返回
-			if(!jsn) return ret;
+			try{
+				var jsn = $.isPlainObject(h) ? h : $.parseJSON(h)
+			}catch(e){
+				// 如果parse 失败，直接返回初始状态的 ret;
+				return ret;
+			}
 
 
 			// 判断jsn 请求是否成功返回数据
@@ -239,10 +247,14 @@ if(!String.prototype.cut){
 			}
 
 			var ret = [[],true];
+
 			// 转json对象
-			var jsn = $.isPlainObject(h) ? h : $.parseJSON(h)
-			// 如果parse 失败，直接返回
-			if(!jsn) return ret;
+			try{
+				var jsn = $.isPlainObject(h) ? h : $.parseJSON(h)
+			}catch(e){
+				// 如果parse 失败，直接返回初始状态的 ret;
+				return ret;
+			}
 
 
 			// 判断jsn 请求是否成功返回数据
@@ -311,42 +323,61 @@ if(!String.prototype.cut){
 
 	template.helper('$unit', function (id,jsn) {
 		id += '';
-		var munits = WT.masnUnits;
-		// munits 去重工作
-		if( !munits[id] ){
-			munits[id] = jsn,
-			WT.ulen++,
-			munits[id].indx = WT.ulen-1;
-
-			return WT.ulen;
-		}else{
-			// 如果有重复，返回0，则不做添加动作
-			return 0
-		}
+		// here shows how to avoid repeated unit being added
+		// the third param indicates that duplication-avoid is open
+    return WT.addUnit(id,jsn,false);
 	});
 
 
 
 	/*
-	@说明：$.Woo.WooTemp 类
-	*/
-	var WT = (function (){
-		var WT = {
-			ulen : 0,
-			init : function (a,b){
-				WT.analyzeResponse = a,
-				WT.render = b,
+  @说明：$.Woo.WooTemp 类
+  */
+  var WT = (function (){
+    var WT = {
+      ulen : 0,
+      latestUnits : {},
+      init : function (a,b){
+        WT.analyzeResponse = a,
+        WT.render = b,
 
-				// 当前可见瀑布流的数据集合
-				WT.masnUnits = {};
-			},
-			reset : function (){
-				WT.ulen = 0,
-				WT.masnUnits = {};
-			}
-		}
-		return WT;
-	})()
+        // 当前可见瀑布流的数据集合
+        WT.masnUnits = {};
+      },
+      reset : function (){
+        WT.ulen = 0,
+        WT.masnUnits = {};
+      },
+      getLatestUnits : function (){
+        return WT.latestUnits;
+      },
+      resetLatestUnits : function (){
+        WT.latestUnits = {};
+      },
+      setUnitsFromLatest : function (){
+        var jsnunits = WT.latestUnits;
+        if( $.isPlainObject(jsnunits) ){
+          WT.masnUnits = jsnunits;
+        }
+      },
+      addUnit : function (id, jsn, avoidduplicate){
+        var munits = WT.masnUnits;
+        // munits 去重工作
+        if( !avoidduplicate || !munits[id] ){
+          WT.latestUnits[id] = jsn,
+          munits[id] = jsn,
+          WT.ulen++,
+          munits[id].indx = WT.ulen-1;
+
+          return WT.ulen;
+        }else{
+          // 如果有重复，返回0，则不做添加动作
+          return 0
+        }
+      }
+    }
+    return WT;
+  })()
 
 	WT.init(ANALYZERESPONSE,RENDER);
 

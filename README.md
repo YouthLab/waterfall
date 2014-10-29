@@ -2,7 +2,7 @@
 This is a full set of Front-end Solutions for Pinterestlike websites.
 
 
-version: 1.0.3
+version: 1.1.1
 
 ## Features:
 1. Multi-waterfalls are supported in one page.
@@ -16,17 +16,25 @@ version: 1.0.3
 1. Useful next(pre) button composed with go-to-top button.
 1. Go-to-top button can bring you to a precise position you want to go.
 1. Dazzling resize mode.
-1. Flexible configs such as: subpagenum in one Upper Page, unitsnum in one subpage etc.
+1. Flexible configs such as: subpagenum in one Upper Page, unitsnum in one subpage etc
+1. if {"exrecycle" : true} is set, invisible units would be recycled during scrolling.
+1. Support Zeptojs.
 
 ## Requirements:
 * jQuery >= 1.6.1
 
 ## Included examples
-### Example sink mode:
+### Example Sink Mode:
 This example shows how to insert an outside block into waterfall either on the left side or on the right side. <br/><a href="http://www.duitang.com/app/woo/examples/sinkleft.html" target="_blank">Click me to have a look!</a>
 
-### Example special column mode:
+### Example Special-Column Mode:
 This example shows how to set a special column(different column width) in your waterfall.<br/><a href="http://www.duitang.com/app/woo/examples/specialcol.html" target="_blank">Click me to have a look!</a>
+
+### Example Messup Mode:
+This example shows a Messup Mode of waterfall in which column covers each other.<br/><a href="http://www.duitang.com/app/woo/examples/messup.html" target="_blank">Click me to have a look!</a>
+
+### Example Auto-Recycle Mode:
+This example shows how to auto-recycle invisible units during scrolling.<br/><a href="http://www.duitang.com/app/woo/examples/recycledemo1.html" target="_blank">Click me to have a look!</a>
 
 ### Example simplest demo:
 This example shows how to build a simple waterfall page without any other data request.<br/><a href="http://www.duitang.com/app/woo/examples/norequest.html" target="_blank">Click me to have a look!</a>
@@ -39,6 +47,9 @@ This example shows how to deal with unit datas with order operation.<br/><a href
 
 ### Example delete:
 This example shows how to deal with unit datas with delete operation.<br/><a href="http://www.duitang.com/app/woo/example-operate/delete.html" target="_blank">Click me to have a look!</a>
+
+### Example zeptojs:
+This example shows how zeptojs works.<br/><a href="http://www.duitang.com/app/woo/examples/zeptomain.html" target="_blank">Click me to have a look!</a>
 
 ## Response data structure recommended:
 {"data":{"blogs":[${unit},...,${unit}],"has_next":true,"totalcount":202},"success":true}
@@ -68,15 +79,19 @@ data.blogs must be an array which contains waterfall units. The unit length in o
 1. 强大的 window resize 自动重绘功能( IE 下不建议打开此功能)。
 1. 可通过配置参数激活特殊列(只能是最左或最右列)，此列宽度可不同于其它列。
 1. 灵活的参数设置，比如：子页数量、子页内单元数量、瀑布流单元宽度和间距 等等等等。
-
+1. 可轻松通过 "exrecycle" : true 参数开启超出屏幕范围的单元块回收功能，极大的减少了dom节点数。
+1. 支持zeptojs
 
 * <a href="http://www.duitang.com/app/woo/examples/main.html" target="_blank">纯静态demo演示——主功能</a>
 * <a href="http://www.duitang.com/app/woo/examples/sinkleft.html" target="_blank">纯静态demo演示——sink开启</a>
 * <a href="http://www.duitang.com/app/woo/examples/specialcol.html" target="_blank">纯静态demo演示——specialcol开启</a>
+* <a href="http://www.duitang.com/app/woo/examples/messup.html" target="_blank">纯静态demo演示——Messup 混乱模式</a>
+* <a href="http://www.duitang.com/app/woo/examples/recycledemo1.html" target="_blank">纯静态demo演示——自动回收模式</a>
 * <a href="http://www.duitang.com/app/woo/examples/mobile.html" target="_blank">纯静态demo演示——mobile模拟</a>
 * <a href="http://www.duitang.com/app/woo/examples/norequest.html" target="_blank">纯静态demo演示——简版无请求</a>
 * <a href="http://www.duitang.com/app/woo/example-operate/order.html" target="_blank">纯静态demo演示——单元排序</a>
 * <a href="http://www.duitang.com/app/woo/example-operate/delete.html" target="_blank">纯静态demo演示——单元删除</a>
+* <a href="http://www.duitang.com/app/woo/examples/zeptomain.html" target="_blank">纯静态demo演示——zeptojs</a>
 
 
 ## 一些保留命名 >>
@@ -157,3 +172,21 @@ Duitang/Waterfall is published under the terms of the MIT License.
 * **1.0.3** 2013-11-4
  * bug fixed, img delay load in units preset via html.
  * bug fixed, sink-right when units total num is smaller than cols num.
+
+* **1.0.3** 2013-11-19
+ * Add a config `refreshwhenswitch` to decide whether to refresh to page one or to keep the latest pagenum when switching happens.
+ * Set a default height value to node `.woo-pcont` when switching happens. If u don't do this, the scrollbar position will move to top due to the height collapse.
+
+
+* **1.0.3** 2014-1-7
+ * Add Messup Mode in which column covers each other.
+ * Clean a case of global variable pollution.
+
+
+
+* **1.1.0** 2014-4-14
+ * Add Auto-Recycle Mode in which invisible units are recycled during scrolling.
+ * Add 3 demos for Auto-Recycle Mode.
+
+* **1.1.1** 2014-4-22
+ * Add Support for Zeptojs.
